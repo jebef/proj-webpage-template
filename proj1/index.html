@@ -29,68 +29,77 @@
 
 <br><br>
 
-<div>
+    <div>
 
-<h2 align="middle">Overview</h2>
-<p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
+        <h2 align="middle">Overview</h2>
+        <p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
 
-<h2 align="middle">Section I: Rasterization</h2>
+        <h2 align="middle">Section I: Rasterization</h2>
 
-<h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+        <h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
+        <p>The rasterize_triangle() function takes in three points and a color as its arguments.
+        First, I calculate the overall minimum and maximum x and y values of the given points in order to determine the 
+        dimensions of the bounding box of the triangle. Next, I iterate over all of the pixels in/on the bounding box and check wether or 
+        not they lie in/on the triangle. This check is performed using three line tests. If the line test results are all greater than zero, 
+        the pixel is inside the triangle (counterclockwise winding). If the line test results are all less than zero, the pixel is inside 
+        the triangle (clockwise winding). If any of the line test results equal zero, the pixel is on an edge of the triangle. If a pixel is 
+        in/on the triangle, I perform a screen bounds check to ensure the pixels coordinates are valid. If the pixel's coordinates are valid, 
+        I call fill_pixel(). 
+        </p>
 
-<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+        <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 
-<div align="middle">
-  <table style="width=100%">
-    <tr>
-      <td>
-        <img src="images/image1.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
-      </td>
-      <td>
-        <img src="images/image2.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
-      </td>
-    </tr>
-    <br>
-    <tr>
-      <td>
-        <img src="images/image3.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
-      </td>
-      <td>
-        <img src="images/image4.png" align="middle" width="400px"/>
-        <figcaption align="middle">Caption goes here.</figcaption>
-      </td>
-    </tr>
-  </table>
-</div>
-
-
-<h3 align="middle">Part 2: Antialiasing triangles</h3>
-
-
-
-<h3 align="middle">Part 3: Transforms</h3>
-
-
-
-<h2 align="middle">Section II: Sampling</h2>
-
-<h3 align="middle">Part 4: Barycentric coordinates</h3>
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/image1.png" align="middle" width="400px" />
+                        <figcaption align="middle">Caption goes here.</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/image2.png" align="middle" width="400px" />
+                        <figcaption align="middle">Caption goes here.</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <img src="images/image3.png" align="middle" width="400px" />
+                        <figcaption align="middle">Caption goes here.</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/image4.png" align="middle" width="400px" />
+                        <figcaption align="middle">Caption goes here.</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
 
-<h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
-
-
-<h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+        <h3 align="middle">Part 2: Antialiasing triangles</h3>
 
 
 
-<h2 align="middle">Section III: Art Competition</h2>
-<p>If you are not participating in the optional art competition, don't worry about this section!</p>
+        <h3 align="middle">Part 3: Transforms</h3>
 
-<h3 align="middle">Part 7: Draw something interesting!</h3>
 
-</body>
+
+        <h2 align="middle">Section II: Sampling</h2>
+
+        <h3 align="middle">Part 4: Barycentric coordinates</h3>
+
+
+        <h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+
+
+        <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
+
+
+
+        <h2 align="middle">Section III: Art Competition</h2>
+        <p>If you are not participating in the optional art competition, don't worry about this section!</p>
+
+        <h3 align="middle">Part 7: Draw something interesting!</h3>
+
+    </div></body>
 </html>
