@@ -23,85 +23,276 @@
 
 <body>
 
-<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2018</h1>
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
 <h1 align="middle">Project 1: Rasterizer</h1>
-<h2 align="middle">YOUR NAME, CS184-??</h2>
+<h2 align="middle">Wyatt Jebef, CS184</h2>
 
 <br><br>
 
     <div>
 
         <h2 align="middle">Overview</h2>
-        <p>Give a high-level overview of what you implemented in this project. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the project.</p>
+        <p>
+            This project was killer! I implemented a basic rasterizer complete with fundamental antialiasing and texture mapping tools. I encountered
+            the most bugs while implementing supersampling support but learned the most while working on the texture mapping portion. My supersampling bug
+            turned out to be trivial - dividing a sum by the wrong value. The math and high-level ideas involved in texture mapping and mipmaps took me
+            longer to digest but were incredibly rewarding to successfully implement. It feels amazing to see an image render correctly after lots of intensive 
+            debugging!!!
+        </p>
 
         <h2 align="middle">Section I: Rasterization</h2>
 
         <h3 align="middle">Part 1: Rasterizing single-color triangles</h3>
-        <p>The rasterize_triangle() function takes in three points and a color as its arguments.
-        First, I calculate the overall minimum and maximum x and y values of the given points in order to determine the 
-        dimensions of the bounding box of the triangle. Next, I iterate over all of the pixels in/on the bounding box and check wether or 
-        not they lie in/on the triangle. This check is performed using three line tests. If the line test results are all greater than zero, 
-        the pixel is inside the triangle (counterclockwise winding). If the line test results are all less than zero, the pixel is inside 
-        the triangle (clockwise winding). If any of the line test results equal zero, the pixel is on an edge of the triangle. If a pixel is 
-        in/on the triangle, I perform a screen bounds check to ensure the pixel's coordinates are valid. If the pixel's coordinates are valid, 
-        I call fill_pixel(). 
+        <p>
+            The rasterize_triangle() function takes in three points and a color as its arguments.
+            First, I calculate the overall minimum and maximum x and y values of the given points in order to determine the
+            dimensions of the bounding box of the triangle. Next, I iterate over all of the pixels in/on the bounding box and check wether or
+            not they lie in/on the triangle. This check is performed using three line tests. If the line test results are all greater than zero,
+            the pixel is inside the triangle (counterclockwise winding). If the line test results are all less than zero, the pixel is inside
+            the triangle (clockwise winding). If any of the line test results equal zero, the pixel is on an edge of the triangle. If a pixel is
+            in/on the triangle, I perform a screen bounds check to ensure the pixel's coordinates are valid. If the pixel's coordinates are valid,
+            I call fill_pixel(). Note: each pixel is sampled using a 0.5 offset applied to its x and y components. My implementation checks those
+            pixels that lie in/on the triangle's bounding box and therefore performs better than a naive implementation that checks every pixel in
+            the screen space.
         </p>
-        
-        <img src="./proj01-task01.png" align="middle" width="400px" />
-
-        <p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 
         <div align="middle">
             <table style="width=100%">
                 <tr>
                     <td>
-                        <img src="images/image1.png" align="middle" width="400px" />
-                        <figcaption align="middle">Caption goes here.</figcaption>
+                        <img src="images/TASK01.png" align="middle" width="400px" />
+                        <figcaption align="middle">Basic test, rendered using 1 sample per pixel.</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3 align="middle">Part 2: Antialiasing triangles</h3>
+
+        <p>
+            I had to make several changes to the rasterize_triangle() and resolve_to_framebuffer() functions
+            in order to implement supersampling. When sampling with a sample rate of 1, a pixel is
+            in/on some triangle or it isn't. When a pixel is in/on a triangle, that pixel is filled with the
+            traingle's color. If a pixel is outside a triangle, it remains filled with the background color. When
+            supersampling, multiple samples per pixel provides information regarding what portion of the pixel
+            lies in/on a triangle. As the sample rate increases so does the information per pixel. This pixel information
+            is stored in a sample buffer that is mapped to the frame buffer using the scaling factor
+            sqrt(sample_rate). By averaging the colors of all supersamples for a given pixel, we are able to
+            construct a more accurate color that better represents the original image or ideal render.
+        </p>
+
+        <p>
+            First, I updated rasterize_triangle(). I mapped the given triangle into sample space ("higher resolution") using the
+            previously mentioned scaling factor. I determined the triangle's scaled bounding box then iterated over it, sampling each
+            sub-pixel at its centerpoint. I wrote all sub-pixel color information to the sample buffer. I also needed
+            to modify rasterize_point() in order to fill all sub-pixels corresponding to the point with the point's color. Lastly, I modified
+            the resolve_to_framebuffer() function in order to correctly map the sample buffer to the frame buffer. I iterated over
+            the dimensions of the frame buffer. At each point/pixel in the frame buffer, I iterated over its corresponding
+            chunk of sub-pixels in the sample buffer, averaging the sub-pixel's colors to determine the most accurate color for the pixel. These new
+            averaged colors are then written to the frame buffer and rasterized.
+        </p>
+
+        <p>
+            The bug that plagued me the most was dividing my color averages by the wrong value. Initially, I was dividing my averages
+            by sqrt(sample_rate) - the scaling factor. This resulted in some strange color behavior. My images would render fine with a
+            sample rate of 1 but as soon as I pushed the sample rate higher, the colors of my images would change dramatically. After, rewriting both
+            the rasterize_triangle() and resolve_to_framebuffer() functions several times, I finally noticed my bug. Dividing my color averages
+            by the sample_rate (number of samples per pixel) instantly fixed the odd color behavior and the unpredictable artifacts I was
+            getting as a result of the bug. Always check your values, even the seemingly simple ones!!!
+        </p>
+
+        <p>
+            Shown below are a series of rasterized images rendered using different sample rates. As you can see, increasing the sample rate
+            equates more accurate pixel coloring and therfore reduces jaggies and other rasterization artifacts.
+        </p>
+
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/TASK02-S01.png" align="middle" width="400px" />
+                        <figcaption align="middle">1 sample per pixel.</figcaption>
                     </td>
                     <td>
-                        <img src="images/image2.png" align="middle" width="400px" />
-                        <figcaption align="middle">Caption goes here.</figcaption>
+                        <img src="images/TASK02-S04.png" align="middle" width="400px" />
+                        <figcaption align="middle">4 samples per pixel.</figcaption>
                     </td>
                 </tr>
                 <br />
                 <tr>
                     <td>
-                        <img src="images/image3.png" align="middle" width="400px" />
-                        <figcaption align="middle">Caption goes here.</figcaption>
+                        <img src="images/TASK02-S09.png" align="middle" width="400px" />
+                        <figcaption align="middle">9 samples per pixel.</figcaption>
                     </td>
                     <td>
-                        <img src="images/image4.png" align="middle" width="400px" />
-                        <figcaption align="middle">Caption goes here.</figcaption>
+                        <img src="images/TASK02-S16.png" align="middle" width="400px" />
+                        <figcaption align="middle">16 samples per pixel.</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3 align="middle">Part 3: Transforms</h3>
+
+        <p>
+            I wanted to pose cubeman mid-air-kick, dropkick? I used some simple rotation calls and adjusted the translation calls for each limb
+            to position them where I wanted. WHAAAAA PAWWW!!!
+        </p>
+
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/TASK03-ROBOT.png" align="middle" width="400px" />
+                        <figcaption align="middle">Cubeman mid dropkick</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h2 align="middle">Section II: Sampling</h2>
+
+        <h3 align="middle">Part 4: Barycentric coordinates</h3>
+
+        <p> A barycentric coordinate system describes a point in reference to some simplex such as 
+            a triangle. The barycentric values alpha, beta, and gamma describe the distances from each vertex
+            of the triangle to a specified point. For example, the image below depicts a triangle with the colors red, 
+            green, and blue set to the triangle's A, B, and C vertices respectively. When rasterizing this triangle, 
+            the color at some point within the triangle is determined by scaling the colors assigned to each vertex
+            by their respective barycentric values (alpha for vertex A, beta for B, gamma for C) and summing these scaled
+            values. This works because alpha, beta, and gamma describe proportional distances - they sum to 1. In simpler 
+            terms, if a point is closer to vertex A, its alpha value will be greater and therefore its color will be 
+            predominantly red (in this case). </p>
+
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/TASK04-TRI.png" align="middle" width="400px" />
+                        <figcaption align="middle">Linear interpolation of red, green, and blue across a triangle.</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/TASK04-CIRCLE.png" align="middle" width="400px" />
+                        <figcaption align="middle">Color interpolation across a circle.</figcaption>
                     </td>
                 </tr>
             </table>
         </div>
 
 
-        <h3 align="middle">Part 2: Antialiasing triangles</h3>
-
-
-
-        <h3 align="middle">Part 3: Transforms</h3>
-
-
-
-        <h2 align="middle">Section II: Sampling</h2>
-
-        <h3 align="middle">Part 4: Barycentric coordinates</h3>
-
-
         <h3 align="middle">Part 5: "Pixel sampling" for texture mapping</h3>
+
+        <p> Sampling can be defined as simply evaluating a function at some given point or pixel. In the case of texture mapping, 
+            we are given three points in screen/world space and their corresponding texture coordinates. By calculating the barycentric
+            values alpha, beta, and gamma we are able to determine wether or not some pixel lies in/on the triangle formed by the given 
+            points. Additionally, if a pixel is a part of the given triangle, we can use these barycentric values to determine the texture 
+            coordinates of said pixel via linear interpolation. Once we have the interpolated texture coordinates corresponding to our pixel, 
+            we need to use this information to obtain a color value from our texture map that most accurately represents our coordinates. In this
+            project I implemented two methods for obtaining a color value given some point in texture space - nearest neighbor and bilinear interpolation. 
+            The nearest neighbor method simply returns the color value associated with the texel nearest our given point. This method is efficient yet 
+            does not yield the best results - similar to rasterizing triangles using a sample rate of 1. Bilinear interpolation uses the weighted
+            average of the color values of the four nearest texels to produce a new color that is more representative of our given point. The images 
+            below highlight the differences between the nearest neighbor and bilinear interpolation methods. For textures that possess a lot of high 
+            frequency color change, very little fading, the differences between the nearest neighbor and bilinear interpolation sampling methods 
+            will be more apparent. </p>
+
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/TASK05-N01.png" align="middle" width="400px" />
+                        <figcaption align="middle">Nearest neighbor, 1 sample per pixel. Color changes from pixel to pixel are stark making the image look 
+                        jagged or pixelated. The letters "BER" are barely discernible.</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/TASK05-N16.png" align="middle" width="400px" />
+                        <figcaption align="middle">Nearest neighbor, 16 samples per pixel. Increased sample rate reduces jaggies but nearest neighbor 
+                        texture mapping still results in muddied letters. </figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <img src="images/TASK05-B01.png" align="middle" width="400px" />
+                        <figcaption align="middle">Bilinear interpolation, 1 sample per pixel. Using this texture sampling method, more accurate
+                        color values are mapped to each pixel. The letters "BER" are better defined.</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/TASK05-B16.png" align="middle" width="400px" />
+                        <figcaption align="middle">Bilinear interpolation, 16 samples per pixel. Increased sample rate further improves the accuracy
+                        of our render. The letters "BER" are well defined and easily discernible.</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
 
 
         <h3 align="middle">Part 6: "Level sampling" with mipmaps for texture mapping</h3>
 
+        <p>Level sampling is the process of determining the best mipmap level to sample for a given point [x, y] in 
+           screen space based on the relationship between changes in pixel size in screen space versus texture space. 
+           I used the barycentric values corresponding to the points [x, y], [x + 1, y], and [x, y + 1] in order to interpolate 
+           three points in texture space: uv00, uv10, and uv01. Subtracting uv00 from uv10 and uv01 gave me the following vectors: 
+           [du/dx, dv/dx] and [du/dy, dv/dy]. These two vectors describe the rate of change of the texture coordinates u and v with respect
+           to the screen space coordinates x and y. Taking the vector with the greatest magnitude, I took the log of its magnitude
+           in order to determine the point's "ideal" mipmap level. Because the result of logging the vector's magnitude is almost always 
+           a non-discrete value, I implemented two methods for determining the final mipmap level - "nearest" and linear interpolation. 
+           The "nearest" method simply returns the integer level closest to the computed continuous level (ie. 4.3 -> 4). For my second method, 
+           I used linear interpolation to construct a new color value based on the weighted sum of two samples from two different mipmap levels 
+           (ie. 4.3 -> 0.7 * (sample from level 4) + 0.3 * (sample from level 5)).  
+            </p>
 
+        <p>In this project I implemented three fundamental sampling techniques - supersampling, texture mapping via pixel sampling, and texture 
+           mapping with mipmaps. Supersampling is a powerful yet costly tool. The higher your sampling rate, the more information gathered per 
+           pixel, the larger your sample buffer, the more memory you need to store this information. Additionally, supersampling requires more 
+           computations per pixel and is therefore costly in terms of runtime. Despite high memory/time costs, supersampling is really effective 
+           at reducing rasterization artifacts such as jaggies. Tuning the sampling rate is a way of "increasing resolution" with a fixed image 
+           resolution. The higher your sampling rate, the more accurate the coloring for each pixel.
+        </p>
 
-        <h2 align="middle">Section III: Art Competition</h2>
-        <p>If you are not participating in the optional art competition, don't worry about this section!</p>
+        <p>
+            Pixel sampling for texture mapping and mipmap level sampling are both similar in implementation but have different costs in terms 
+            of memory usage. Pixel sampling using bilinear interpolation is really good at finding/constructing the best fitting color for some 
+            arbitrary point in texture space. Although slightly more inefficient than nearest neighbor sampling, the bilinear approach results in 
+            a much more accurate mapping of a texture onto some object/shape and does not strain memory. Mipmaps on the other hand offer further 
+            antialiasing benefits but with a higher memory and time cost. Storing each level of a mipmap requires additional memory and the process 
+            of determining which mipmap level to sample requires additional computations and is therefore less efficient.
+        </p>
 
-        <h3 align="middle">Part 7: Draw something interesting!</h3>
-
+        <div align="middle">
+            <table style="width=100%">
+                <tr>
+                    <td>
+                        <img src="images/TASK06-01.png" align="middle" width="400px" />
+                        <figcaption align="middle">Nearest neighbor at mipmap level 0. There are sharp contrasts present.</figcaption>
+                    </td>
+                    <td>
+                        <img src="images/TASK06-02.png" align="middle" width="400px" />
+                        <figcaption align="middle">Bilinear interpolation at mipmap level 0. Contrast somewhat reduced by interpolating 
+                        multiple texel color values. </figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr>
+                    <td>
+                        <img src="images/TASK06-03.png" align="middle" width="400px" />
+                        <figcaption align="middle">Nearest neighbor at nearest mipmap level. Contrast greatly reduced via improved texel 
+                        sampling from a lower resolution texture map. </figcaption>
+                    </td>
+                    <td>
+                        <img src="images/TASK06-04.png" align="middle" width="400px" />
+                        <figcaption align="middle">Bilinear interpolation at nearest mipmap level. Additional improvements by interpolating
+                        over newly interpolated texel color values. </figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div></body>
 </html>
