@@ -1,7 +1,408 @@
-<html>
-	<head>
-	</head>
-	<body>
-		Project 3-1 here
-	</body>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    background-color: white;
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  kbd {
+    color: #121212;
+  }
+</style>
+<title>CS 184 Project 3-1</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+
+<script>
+  MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
+<h1 align="middle">Project 3-1: Physically-Based Rendering with Pathtracing</h1>
+<h2 align="middle">Wyatt Jebef</h2>
+
+<br><br>
+
+    <div>
+
+        <h2 align="middle">Overview</h2>
+        <p>
+            YOUR RESPONSE GOES HERE
+        </p>
+        <br />
+
+
+        <h2 align="middle">Task I: Ray Generation and Scene Intersection</h2>
+
+        <h3 align="middle">Part 1: Generating Camera Rays</h3>
+
+
+        <b>
+            Walk through the ray generation and primitive intersection parts of the rendering pipeline.
+        </b>
+        <p>
+            The ray generation pipeline begins with a normalized point in two-dimensional image space. First, we transform this point (x, y) from image space 
+			to the virtual camera sensor in camera space. The bounds of our original image are defined by the unit square with its bottom-left corner at the origin; the 
+			bounds of our virtual camera sensor are defined by the points (-tan(0.5 * hFov), -tan(0.5 * vFov), -1.0) and (tan(0.5 * hFov), tan(0.5 * vFov), -1.0), the bottom-left 
+			and top-right corners respectively with the center of our sensor positioned at (0.0, 0.0, -1.0). In order to transform our point (x, y) from image space to the 
+			camera sensor in camera space, we homogenize our point and use an affine transformation matrix F = [[2a, 0, -a,], [0, 2b, -b], [0, 0, 1]], where a = tan(0.5 * hFov) and b
+			= tan(0.5 * vFov). After multiplying our point (x, y) by our transformation matrix F, we are left with its corresponding two-dimensional homogenous point (x', y', w) on the 
+			virtual camera sensor. Next, we convert (x', y', w) back to two dimensional cartesian coordinates by dividing the x and y values by w. Now we have the x and y values of our point in 
+			camera space and can simply add our constant z value -1. Lastly, we transform our ray in camera space to world space using the provided c2w rotation matrix and normalize it. 
+        </p>
+		<p>
+            For each pixel in our image space, we use a Monte Carlo grid sampling technique to estimate its integral of radiance. This gives us a good estimate of the intensity of the light that 
+			strikes the point in our scene corresponding to some pixel in our original image. Combined with basic primitive intersection detection, we can now render a three-dimensional scene 
+			with physically-based lighting. 
+        </p>
+		<b>
+            Explain the triangle intersection algorithm you implemented in your own words.
+		</b>
+		<p>
+            I implemented the Moller Trumbore algorithm to calculate values regarding ray-triangle intersections. ADD EXPLANATION OF ALGO. 
+        </p>
+		
+        <br />
+
+        <b>
+            Show images with normal shading for a few small .dae files.
+		</b>
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="./docs/images/CBempty.png" align="middle" width="400px" />
+                        <figcaption>A simple scene</figcaption>
+                    </td>
+                    <td>
+                        <img src="./docs/images/CBspheres.png" align="middle" width="400px" />
+                        <figcaption>Add spheres</figcaption>
+                    </td>
+				</tr>
+            </table>
+        </div>
+        <br />
+
+        <!-- Example of including a single figure -->
+        <div align="middle">
+            <img src="./task01-L6.png" align="middle" width="50%" />
+            <figcaption>Bezier curve included</figcaption>
+        </div>
+        <br />
+
+        <b>
+            Show a screenshot of a slightly different Bezier curve by moving the original control points around and modifying the parameter \(t\) via mouse scrolling.
+        </b>
+        <!-- Example of including a single figure -->
+        <div align="middle">
+            <img src="./task01-P2.png" align="middle" width="50%" />
+            <figcaption>Modified curve with adjusted t-value</figcaption>
+        </div>
+        <br />
+
+
+        <h3 align="middle">Part 2: Bezier Surfaces with Separable 1D de Casteljau</h3>
+        <b>
+            Briefly explain how de Casteljau algorithm extends to Bezier surfaces and how you implemented it in order to evaluate Bezier surfaces.
+        </b>
+        <p>
+            The de Casteljau algorithm can be used to evaluate a point on a Bezier surface by linearly interpolating n Bezier curves in u
+            (using the given u-value as t) then linearly interpolating the resultant n points in v (using the given v-value as t).
+        </p>
+        <br />
+
+
+        <b>
+            Show a screenshot of bez/teapot.bez (not .dae) evaluated by your implementation.
+        </b>
+        <br />
+        <!-- Example of including a single figure -->
+        <div align="middle">
+            <img src="./task02-TEA.png" align="middle" width="50%" />
+            <figcaption>The Utah Teapot</figcaption>
+        </div>
+        <br />
+
+
+        <h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
+
+        <h3 align="middle">Part 3: Area-Weighted Vertex Normals</h3>
+
+        <b>
+            Briefly explain how you implemented the area-weighted vertex normals.
+        </b>
+        <p>
+            I used a do-while loop to iterate through all of the halfedges adjacent to the vertex. At each halfedge, I gathered the
+            points that describe the halfedge's face or triangle. I used these points to calculate the triangle's area and its normal then
+            added the triangle's area-weighted normal (normal * area) to an accumulator vector vn. After iterating through all of the
+            adjacent halfedges, I normalized and returned vn - the area-weighted vertex normal.
+        </p>
+        <br />
+
+
+        <b>
+            Show screenshots of dae/teapot.dae (not .bez) comparing teapot shading with and without vertex normals. Use <kbd>Q</kbd> to toggle default flat shading and Phong shading.
+        </b>
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="./task03-R.png" align="middle" width="400px" />
+                        <figcaption>Shading without vertex normals</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task03-S.png" align="middle" width="400px" />
+                        <figcaption>Shading with vertex normals</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+
+        <h3 align="middle">Part 4: Edge Flip</h3>
+        <b>
+            Briefly explain how you implemented the edge flip operation and describe any interesting implementation / debugging tricks you have used.
+        </b>
+        <p>
+            The guide linked by staff member Ashley Chu in the "Edge Flip" Ed thread really helped me better understand the
+            necessary implementation steps for this task. First, I drew out a mesh with two triangles as illustrated in the spec.
+            I labelled all of its halfedges, edges, vertices, and faces (pre-flip). I repeated this process after flipping the shared
+            edge, being careful to correctly translate each mesh element. After doing so, I had a template to directly implement the
+            edge flip as described in the guide - label all mesh elements, check for boundary, update pointers, done!
+        </p>
+        <br />
+
+
+        <b>
+            Show screenshots of the teapot before and after some edge flips.
+        </b>
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="./task04-01.png" align="middle" width="400px" />
+                        <figcaption>Level 0</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task04-02.png" align="middle" width="400px" />
+                        <figcaption>Level 1</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="./task04-03.png" align="middle" width="400px" />
+                        <figcaption>Level 2</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task04-04.png" align="middle" width="400px" />
+                        <figcaption>Level 3</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="./task04-05.png" align="middle" width="400px" />
+                        <figcaption>Level 4</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task04-06.png" align="middle" width="400px" />
+                        <figcaption>Level 5</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="./task04-07.png" align="middle" width="400px" />
+                        <figcaption>Level 0</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task04-08.png" align="middle" width="400px" />
+                        <figcaption>Level 1</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="./task04-09.png" align="middle" width="400px" />
+                        <figcaption>Level 2</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task04-10.png" align="middle" width="400px" />
+                        <figcaption>Level 3</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+
+        <h3 align="middle">Part 5: Edge Split</h3>
+        <b>
+            Briefly explain how you implemented the edge split operation and describe any interesting implementation / debugging tricks you have used.
+        </b>
+        <p>
+            I followed the same guidlines and procedure detailed in my edge flip writeup with some small changes: I added 6 halfedges,
+            1 vertex, 3 edges, and 2 faces. A small bug I ran into was forgetting to set the position of the new vertex m. When left unset,
+            the vertex is positioned at (0, 0, 0) which was causing my mesh to create inverted pyramids when splitting edges. I fixed this bug
+            by setting the position of the vertex to the midpoint of the edge being split.
+        </p>
+        <br />
+
+
+        <b>
+            Show screenshots of a mesh before and after some edge splits.
+        </b>
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="./task05-01.png" align="middle" width="400px" />
+                        <figcaption>No splits</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task05-02.png" align="middle" width="400px" />
+                        <figcaption>1 split</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="./task05-03.png" align="middle" width="400px" />
+                        <figcaption>2 splits</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task05-04.png" align="middle" width="400px" />
+                        <figcaption>3 splits</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="./task05-05.png" align="middle" width="400px" />
+                        <figcaption>4 splits</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task05-06.png" align="middle" width="400px" />
+                        <figcaption>5 splits</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="./task05-07.png" align="middle" width="400px" />
+                        <figcaption>6 splits</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task05-08.png" align="middle" width="400px" />
+                        <figcaption>7 splits</figcaption>
+                    </td>
+                </tr>
+                <br />
+                <tr align="center">
+                    <td>
+                        <img src="./task05-09.png" align="middle" width="400px" />
+                        <figcaption>8 splits</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task05-10.png" align="middle" width="400px" />
+                        <figcaption>9 splits</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+
+        <b>
+            Show screenshots of a mesh before and after a combination of both edge splits and edge flips.
+        </b>
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="./task05-P2N.png" align="middle" width="400px" />
+                        <figcaption>Original mesh</figcaption>
+                    </td>
+                    <td>
+                        <img src="./task05-P2S.png" align="middle" width="400px" />
+                        <figcaption>Mesh with some edges flipped and split</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+
+        <h3 align="middle">Part 6: Loop Subdivision for Mesh Upsampling</h3>
+        <b>
+            Briefly explain how you implemented the loop subdivision and describe any interesting implementation / debugging tricks you have used.
+        </b>
+        <p>
+            First, I iterated through all of the vertices in the original mesh and calculated their new positions according to the spec.
+            I then stored these new positions in each vertice's newPosition member. Next, I iterated through all of the edges of the original mesh
+            and calculated the positions for each new vertex, storing these positions in each edge's newPosition member. Then I split every edge in
+            the original mesh and made sure to mark new and old edges/vertices as well as assigning the new vertex's newPosition to that of the original edge's newPosition. Next, I flipped all new edges comprised of a new and olf vertex. Lastly,
+            I updated all of the vertex positions in the new mesh by assigning their position to their newPosition.
+        </p>
+        <br />
+
+
+        <b>
+            Take some notes, as well as some screenshots, of your observations on how meshes behave after loop subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some edges?
+        </b>
+        <p>
+            Sharp corners are gradually smoothed by loop subdivision. Perhaps presplitting edge mesh members you can retain the sharpness of edges
+            as in the cube for example.
+        </p>
+        <br />
+        <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="./Screenshot (75).png" align="middle" width="400px" />
+                        <figcaption>Cube</figcaption>
+                    </td>
+                    <td>
+                        <img src="./Screenshot (76).png" align="middle" width="400px" />
+                        <figcaption>Some subdivision</figcaption>
+                    </td>
+                </tr>
+                <tr align="center">
+                    <td>
+                        <img src="./Screenshot (77).png" align="middle" width="400px" />
+                        <figcaption>More</figcaption>
+                    </td>
+                    <td>
+                        <img src="./Screenshot (78).png" align="middle" width="400px" />
+                        <figcaption>And more...</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+
+
+    </div></body>
 </html>
