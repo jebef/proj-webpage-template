@@ -56,9 +56,6 @@
 
         <h2 align="middle">Task I: Ray Generation and Scene Intersection</h2>
 
-        <h3 align="middle">Part 1: Generating Camera Rays</h3>
-
-
         <b>
             Walk through the ray generation and primitive intersection parts of the rendering pipeline.
         </b>
@@ -89,6 +86,9 @@
         <b>
             Show images with normal shading for a few small .dae files.
 		</b>
+		
+	  	<br />
+	    
         <div align="middle">
             <table style="width:100%">
                 <tr align="center">
@@ -106,15 +106,14 @@
 		
         <br />
 
-        <h3 align="middle">Part 2: Bounding Volume Hierarchy</h3>
+        <h2 align="middle">Part 2: Bounding Volume Hierarchy</h2>
         <b>
             Walk through your BVH construction algorithm. Explain the heuristic you chose for picking the splitting point.
         </b>
         <p>
             We are given two primitive iterators "start" and "end" as well as a "max_leaf_size". First, we construct a bounding box that encompasses all of the 
 			primitives between [start, end). Next, we determine wether or not the node being constructed is a leaf or internal node. This is done by checking if the 
-			number of primitives in our main bounding box is <= max_leaf_size. If the node is a leaf, we initialize its fields as follows: the node's bounding box is the 
-			main bounding box, its start and end iterators are the same as those passed in, and its left and right children are null. If the node is not a leaf, we must 
+			number of primitives in our main bounding box is <= max_leaf_size. If the node is a leaf, we initialize its fields as follows: the node's start and end iterators are the same as those passed in and its left and right children are null. If the node is not a leaf, we must 
 			partition the primitives within our main bounding box into two groups. We do this by determining the longest axis (or edge) of the main bounding box and 
 			partitioning primitives based on whether or not the component of their centroids that corresponds to said axis is less than or equal to the component of the main bounding box's 
 			centroid corresponding to said axis. If the main bounding box's longest edge was parallel to the x-axis, we would partition primitives based on whether or not 
@@ -126,6 +125,7 @@
         <b>
             Show images with normal shading for a few large .dae files that you can only render with BVH acceleration.
         </b>
+		<br />
         <br />
 		 <div align="middle">
             <table style="width:100%">
