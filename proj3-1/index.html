@@ -103,47 +103,51 @@
 				</tr>
             </table>
         </div>
+		
         <br />
 
-        <!-- Example of including a single figure -->
-        <div align="middle">
-            <img src="./task01-L6.png" align="middle" width="50%" />
-            <figcaption>Bezier curve included</figcaption>
-        </div>
-        <br />
-
+        <h3 align="middle">Part 2: Bounding Volume Hierarchy</h3>
         <b>
-            Show a screenshot of a slightly different Bezier curve by moving the original control points around and modifying the parameter \(t\) via mouse scrolling.
-        </b>
-        <!-- Example of including a single figure -->
-        <div align="middle">
-            <img src="./task01-P2.png" align="middle" width="50%" />
-            <figcaption>Modified curve with adjusted t-value</figcaption>
-        </div>
-        <br />
-
-
-        <h3 align="middle">Part 2: Bezier Surfaces with Separable 1D de Casteljau</h3>
-        <b>
-            Briefly explain how de Casteljau algorithm extends to Bezier surfaces and how you implemented it in order to evaluate Bezier surfaces.
+            Walk through your BVH construction algorithm. Explain the heuristic you chose for picking the splitting point.
         </b>
         <p>
-            The de Casteljau algorithm can be used to evaluate a point on a Bezier surface by linearly interpolating n Bezier curves in u
-            (using the given u-value as t) then linearly interpolating the resultant n points in v (using the given v-value as t).
+            We are given two primitive iterators "start" and "end" as well as a "max_leaf_size". First, we construct a bounding box that encompasses all of the 
+			primitives between [start, end). Next, we determine wether or not the node being constructed is a leaf or internal node. This is done by checking if the 
+			number of primitives in our main bounding box is <= max_leaf_size. If the node is a leaf, we initialize its fields as follows: the node's bounding box is the 
+			main bounding box, its start and end iterators are the same as those passed in, and its left and right children are null. If the node is not a leaf, we must 
+			partition the primitives within our main bounding box into two groups. We do this by determining the longest axis (or edge) of the main bounding box and 
+			partitioning primitives based on whether or not the component of their centroids that corresponds to said axis is less than or equal to the component of the main bounding box's 
+			centroid corresponding to said axis. If the main bounding box's longest edge was parallel to the x-axis, we would partition primitives based on whether or not 
+			the x-component of their centroids was less than or equal to the x-component of the main bounding box's centroid. Next, we check to make sure neither partition is 
+			empty. If so, we adjust the start/end iterator by +/- num_prims / 2 (num_prims = number of primitives in main bounding box). Finally, we construct the node's left and 
+			right children recursively using our new partitions and return the node. 
         </p>
         <br />
-
-
         <b>
-            Show a screenshot of bez/teapot.bez (not .dae) evaluated by your implementation.
+            Show images with normal shading for a few large .dae files that you can only render with BVH acceleration.
         </b>
         <br />
-        <!-- Example of including a single figure -->
-        <div align="middle">
-            <img src="./task02-TEA.png" align="middle" width="50%" />
-            <figcaption>The Utah Teapot</figcaption>
+		 <div align="middle">
+            <table style="width:100%">
+                <tr align="center">
+                    <td>
+                        <img src="./docs/images/CBlucy.png" align="middle" width="400px" />
+                        <figcaption>CBlucy.dae rendered with BVH acceleration</figcaption>
+                    </td>
+                    <td>
+                        <img src="./docs/images/maxplanck.png" align="middle" width="400px" />
+                        <figcaption>maxplanck.dae rendered with BVH acceleration</figcaption>
+                    </td>
+				</tr>
+            </table>
         </div>
         <br />
+		  <b>
+            Compare rendering times on a few scenes with moderately complex geometries with and without BVH acceleration. Present your results in a one-paragraph analysis.
+        </b>
+        <p>
+            
+        </p>
 
 
         <h2 align="middle">Section II: Triangle Meshes and Half-Edge Data Structure</h2>
